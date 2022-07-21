@@ -1,2 +1,2 @@
 # RetailManager
-Retail management system
+Retail management system built by rishabh wadhawan
