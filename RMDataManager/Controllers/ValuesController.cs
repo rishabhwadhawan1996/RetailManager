@@ -1,11 +1,7 @@
-﻿using Microsoft.AspNet.Identity;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+﻿using System.Collections.Generic;
 using System.Web.Http;
+
+using Microsoft.AspNet.Identity;
 
 namespace RMDataManager.Controllers
 {
@@ -16,7 +12,7 @@ namespace RMDataManager.Controllers
         public IEnumerable<string> Get()
         {
             string userId = RequestContext.Principal.Identity.GetUserId();
-            return new string[] { "value1", "value2" };
+            return new string[] { "value1", "value2", userId };
         }
 
         // GET api/values/5
@@ -26,12 +22,12 @@ namespace RMDataManager.Controllers
         }
 
         // POST api/values
-        public void Post([FromBody]string value)
+        public void Post([FromBody] string value)
         {
         }
 
         // PUT api/values/5
-        public void Put(int id, [FromBody]string value)
+        public void Put(int id, [FromBody] string value)
         {
         }
 
