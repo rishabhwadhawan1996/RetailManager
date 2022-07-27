@@ -11,7 +11,7 @@ namespace RMDesktopUI
 {
     public class Bootstrapper : BootstrapperBase
     {
-        private SimpleContainer container = new SimpleContainer();
+        private readonly SimpleContainer container = new SimpleContainer();
 
         public Bootstrapper()
         {
