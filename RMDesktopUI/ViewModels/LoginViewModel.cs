@@ -8,6 +8,8 @@ using Caliburn.Micro;
 
 using RMDesktopUI.Helpers;
 
+using RMDesktopUILibrary.Helpers;
+
 namespace RMDesktopUI.ViewModels
 {
     public class LoginViewModel:Screen
@@ -90,6 +92,7 @@ namespace RMDesktopUI.ViewModels
             try
             {
                 var result = await apiHelper.Authenticate(Username, Password);
+                await apiHelper.GetLoggedInUserInfo(result.AccessToken);
             }
             catch(Exception ex)
             {

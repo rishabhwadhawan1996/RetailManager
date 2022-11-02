@@ -9,7 +9,7 @@ namespace RMDesktopUI.ViewModels
         public ShellViewModel(LoginViewModel loginVM)
         {
             loginViewModel = loginVM;
-            ActivateItem(loginViewModel);
+            ActivateItemAsync(loginViewModel).Wait();
         }
 
     }
