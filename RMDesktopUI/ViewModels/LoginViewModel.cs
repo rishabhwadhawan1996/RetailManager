@@ -14,14 +14,16 @@ namespace RMDesktopUI.ViewModels
 {
     public class LoginViewModel:Screen
     {
-        public LoginViewModel(IAPIHelper ApiHelper)
+        public LoginViewModel(IAPIHelper ApiHelper,IEventAggregator events)
         {
             apiHelper = ApiHelper;
+            eventAgregator = events;
         }
 
         private string username;
         private string password;
         private IAPIHelper apiHelper;
+        private IEventAggregator eventAgregator;
 
         public string Username       
         {
@@ -93,6 +95,7 @@ namespace RMDesktopUI.ViewModels
             {
                 var result = await apiHelper.Authenticate(Username, Password);
                 await apiHelper.GetLoggedInUserInfo(result.AccessToken);
+                eventAgregator.PublishOnUIThreadAsync(new LogOnEventModel()).Wait();
             }
             catch(Exception ex)
             {
