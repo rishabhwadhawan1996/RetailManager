@@ -17,7 +17,7 @@ namespace RMDesktopUI.ViewModels
             salesVm = salesViewModel;
             eventAgregator = events;
             eventAgregator.Subscribe(this);
-            ActivateItemAsync(container.GetInstance<LoginViewModel>();).Wait();
+            ActivateItemAsync(container.GetInstance<LoginViewModel>()).Wait();
         }
 
         public async Task HandleAsync(LogOnEventModel message, CancellationToken cancellationToken)

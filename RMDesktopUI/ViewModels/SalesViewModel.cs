@@ -1,14 +1,37 @@
 ﻿using System.ComponentModel;
+using System.Threading.Tasks;
 
 using Caliburn.Micro;
+
+using RMDesktopUILibrary.API;
+using RMDesktopUILibrary.Models;
 
 namespace RMDesktopUI.ViewModels
 {
     public class SalesViewModel:Screen
     {
-        private BindingList<string> products;
 
-        public BindingList<string> Products
+        public SalesViewModel(IProductEndpoint prodEndpoint)
+        {
+            productEndpoint = prodEndpoint;
+            
+        }
+
+        protected override async void OnViewLoaded(object view)
+        {
+            base.OnViewLoaded(view);
+            await LoadProducts();
+        }
+
+        private async Task LoadProducts()
+        {
+            var productList = await productEndpoint.GetAll();
+            Products = new BindingList<ProductModel>(productList);
+        }
+
+        private BindingList<ProductModel> products;
+
+        public BindingList<ProductModel> Products
         {
             get { return products; }
             set
@@ -31,6 +54,7 @@ namespace RMDesktopUI.ViewModels
         }
 
         private int itemQuantity;
+        private IProductEndpoint productEndpoint;
 
         public int ItemQuantity
         {

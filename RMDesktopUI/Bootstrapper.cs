@@ -9,6 +9,7 @@ using Caliburn.Micro;
 using RMDesktopUI.Helpers;
 using RMDesktopUI.ViewModels;
 
+using RMDesktopUILibrary.API;
 using RMDesktopUILibrary.Helpers;
 using RMDesktopUILibrary.Models;
 
@@ -30,7 +31,8 @@ namespace RMDesktopUI
 
         protected override void Configure()
         {
-            container.Instance(container);
+            container.Instance(container).PerRequest<IProductEndpoint, ProductEndpoint>();
+
             container.Singleton<IWindowManager, WindowManager>()
                 .Singleton<IEventAggregator, EventAggregator>()
                 .Singleton<ILoggedInUserModel,LoggedInUserModel>()
