@@ -29,5 +29,7 @@ namespace RMDesktopUILibrary.Models
         /// 
         /// </summary>
         public int QuantityInStock { get; set; }
+
+        public bool IsTaxable { get; set; }
     }
 }

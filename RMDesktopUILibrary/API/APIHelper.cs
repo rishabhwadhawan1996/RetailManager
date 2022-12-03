@@ -11,7 +11,7 @@ namespace RMDesktopUILibrary.Helpers
 {
     public class APIHelper : IAPIHelper
     {
-        private ILoggedInUserModel loggedInUserModel;
+        private readonly ILoggedInUserModel loggedInUserModel;
 
         private HttpClient apiClient { get; set; }
 
