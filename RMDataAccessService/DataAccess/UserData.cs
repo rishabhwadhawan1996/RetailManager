@@ -11,7 +11,7 @@ namespace RMDataAccessService.DataAccess
         {
             SqlDataAccess sql = new SqlDataAccess();
             var p = new { id };
-            List<UserModel> output = sql.LoadData<UserModel, dynamic>("dbo.spUserLoopup", p, "RMData");
+            List<UserModel> output = sql.LoadData<UserModel, dynamic>("dbo.spUserLookup", p, "RMData");
             return output;
         }
 

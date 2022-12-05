@@ -94,8 +94,8 @@ namespace RMDesktopUI.ViewModels
             try
             {
                 var result = await apiHelper.Authenticate(Username, Password);
-                await apiHelper.GetLoggedInUserInfo(result.AccessToken);
-                eventAgregator.PublishOnUIThreadAsync(new LogOnEventModel()).Wait();
+                await apiHelper.GetLoggedInUserInfo(result.Access_Token);
+                await eventAgregator.PublishOnUIThreadAsync(new LogOnEventModel());
             }
             catch(Exception ex)
             {
