@@ -4,9 +4,12 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
+using AutoMapper;
+
 using Caliburn.Micro;
 
 using RMDesktopUI.Helpers;
+using RMDesktopUI.Models;
 using RMDesktopUI.ViewModels;
 
 using RMDesktopUILibrary.API;
@@ -31,14 +34,27 @@ namespace RMDesktopUI
 
         protected override void Configure()
         {
+            IMapper mapper = InitializeAutoMapper();
+            container.Instance(mapper);
             container.Instance(container).PerRequest<IProductEndpoint, ProductEndpoint>();
 
             container.Singleton<IWindowManager, WindowManager>()
                 .Singleton<IEventAggregator, EventAggregator>()
-                .Singleton<ILoggedInUserModel,LoggedInUserModel>()
+                .Singleton<ILoggedInUserModel, LoggedInUserModel>()
                 .Singleton<IAPIHelper, APIHelper>()
-                .Singleton<IConfigHelper,ConfigHelper>();
+                .Singleton<IConfigHelper, ConfigHelper>();
             GetType().Assembly.GetTypes().Where(type => type.IsClass).Where(type => type.Name.EndsWith("ViewModel")).ToList().ForEach(viewModelType => container.RegisterPerRequest(viewModelType, viewModelType.ToString(), viewModelType));
+        }
+
+        private IMapper InitializeAutoMapper()
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<ProductModel, ProductDisplayModel>();
+                cfg.CreateMap<CartItemModel, CartItemDisplayModel>();
+            });
+            var mapper = config.CreateMapper();
+            return mapper;
         }
 
         protected override void OnStartup(object sender, StartupEventArgs e)

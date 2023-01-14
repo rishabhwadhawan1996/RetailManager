@@ -1,8 +1,13 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
+using AutoMapper;
+
 using Caliburn.Micro;
+
+using RMDesktopUI.Models;
 
 using RMDesktopUILibrary.API;
 using RMDesktopUILibrary.Helpers;
@@ -13,10 +18,12 @@ namespace RMDesktopUI.ViewModels
     public class SalesViewModel : Screen
     {
 
-        public SalesViewModel(IProductEndpoint prodEndpoint,IConfigHelper configurationHelper)
+        public SalesViewModel(IProductEndpoint prodEndpoint,
+            IConfigHelper configurationHelper, IMapper mapperInstance)
         {
             productEndpoint = prodEndpoint;
             configHelper = configurationHelper;
+            mapper = mapperInstance;
         }
 
         protected override async void OnViewLoaded(object view)
@@ -28,12 +35,13 @@ namespace RMDesktopUI.ViewModels
         private async Task LoadProducts()
         {
             var productList = await productEndpoint.GetAll();
-            Products = new BindingList<ProductModel>(productList);
+            var products = mapper.Map<List<ProductDisplayModel>>(productList);
+            Products = new BindingList<ProductDisplayModel>(products);
         }
 
-        private BindingList<ProductModel> products;
+        private BindingList<ProductDisplayModel> products;
 
-        public BindingList<ProductModel> Products
+        public BindingList<ProductDisplayModel> Products
         {
             get { return products; }
             set
@@ -43,9 +51,9 @@ namespace RMDesktopUI.ViewModels
             }
         }
 
-        private BindingList<CartItemModel> cart = new BindingList<CartItemModel>();
+        private BindingList<CartItemDisplayModel> cart = new BindingList<CartItemDisplayModel>();
 
-        public BindingList<CartItemModel> Cart
+        public BindingList<CartItemDisplayModel> Cart
         {
             get { return cart; }
             set
@@ -58,6 +66,7 @@ namespace RMDesktopUI.ViewModels
         private int itemQuantity = 1;
         private IProductEndpoint productEndpoint;
         private IConfigHelper configHelper;
+        private IMapper mapper;
 
         public int ItemQuantity
         {
@@ -139,17 +148,14 @@ namespace RMDesktopUI.ViewModels
         }
         public void AddToCart()
         {
-            CartItemModel existingItem = Cart.FirstOrDefault(x => x.Product == selectedProduct);
+            CartItemDisplayModel existingItem = Cart.FirstOrDefault(x => x.Product == selectedProduct);
             if (existingItem != null)
             {
-                //Hack
                 existingItem.QuantityInCart += ItemQuantity;
-                Cart.Remove(existingItem);
-                Cart.Add(existingItem);
             }
             else
             {
-                CartItemModel item = new CartItemModel()
+                CartItemDisplayModel item = new CartItemDisplayModel()
                 {
                     Product = SelectedProduct,
                     QuantityInCart = ItemQuantity
@@ -168,14 +174,28 @@ namespace RMDesktopUI.ViewModels
             get
             {
                 bool output = false;
+                if (SelectedCartItem!=null)
+                {
+                    output = true;
+                }
                 return output;
             }
         }
         public void RemoveFromCart()
         {
+            SelectedCartItem.Product.QuantityInStock += 1;
+            if (SelectedCartItem.QuantityInCart > 1)
+            {
+                SelectedCartItem.QuantityInCart -= 1;
+            }
+            else
+            {
+                Cart.Remove(SelectedCartItem);
+            }
             NotifyOfPropertyChange(() => SubTotal);
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
+            NotifyOfPropertyChange(() => CanCheckOut);
         }
 
         public bool CanCheckOut
@@ -191,9 +211,9 @@ namespace RMDesktopUI.ViewModels
 
         }
 
-        private ProductModel selectedProduct;
+        private ProductDisplayModel selectedProduct;
 
-        public ProductModel SelectedProduct
+        public ProductDisplayModel SelectedProduct
         {
             get { return selectedProduct; }
             set
@@ -201,6 +221,19 @@ namespace RMDesktopUI.ViewModels
                 selectedProduct = value;
                 NotifyOfPropertyChange(() => SelectedProduct);
                 NotifyOfPropertyChange(() => CanAddToCart);
+            }
+        }
+
+        private CartItemDisplayModel selectedCartItem;
+
+        public CartItemDisplayModel SelectedCartItem
+        {
+            get { return selectedCartItem; }
+            set
+            {
+                selectedCartItem = value;
+                NotifyOfPropertyChange(() => SelectedCartItem);
+                NotifyOfPropertyChange(() => CanRemoveFromCart);
             }
         }
 
