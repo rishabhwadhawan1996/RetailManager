@@ -37,7 +37,7 @@ namespace RMDesktopUI
             IMapper mapper = InitializeAutoMapper();
             container.Instance(mapper);
             container.Instance(container).PerRequest<IProductEndpoint, ProductEndpoint>();
-
+            container.Instance(container).PerRequest<ISaleEndpoint, SaleEndpoint>();
             container.Singleton<IWindowManager, WindowManager>()
                 .Singleton<IEventAggregator, EventAggregator>()
                 .Singleton<ILoggedInUserModel, LoggedInUserModel>()

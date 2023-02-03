@@ -19,8 +19,9 @@ namespace RMDesktopUI.ViewModels
     {
 
         public SalesViewModel(IProductEndpoint prodEndpoint,
-            IConfigHelper configurationHelper, IMapper mapperInstance)
+            IConfigHelper configurationHelper, IMapper mapperInstance, ISaleEndpoint saleEndpoint)
         {
+            this.saleEndpoint = saleEndpoint;
             productEndpoint = prodEndpoint;
             configHelper = configurationHelper;
             mapper = mapperInstance;
@@ -64,6 +65,7 @@ namespace RMDesktopUI.ViewModels
         }
 
         private int itemQuantity = 1;
+        private ISaleEndpoint saleEndpoint;
         private IProductEndpoint productEndpoint;
         private IConfigHelper configHelper;
         private IMapper mapper;
@@ -167,6 +169,7 @@ namespace RMDesktopUI.ViewModels
             NotifyOfPropertyChange(() => SubTotal);
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
+            NotifyOfPropertyChange(() => CanCheckOut);
         }
 
         public bool CanRemoveFromCart
@@ -174,7 +177,7 @@ namespace RMDesktopUI.ViewModels
             get
             {
                 bool output = false;
-                if (SelectedCartItem!=null)
+                if (SelectedCartItem!=null && SelectedCartItem.QuantityInCart>0)
                 {
                     output = true;
                 }
@@ -196,6 +199,7 @@ namespace RMDesktopUI.ViewModels
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
             NotifyOfPropertyChange(() => CanCheckOut);
+            NotifyOfPropertyChange(() => CanAddToCart);
         }
 
         public bool CanCheckOut
@@ -203,12 +207,26 @@ namespace RMDesktopUI.ViewModels
             get
             {
                 bool output = false;
+                if (Cart.Count > 0)
+                {
+                    return true;
+                }
                 return output;
             }
         }
-        public void CheckOut()
+        public async void CheckOut()
         {
+            SaleModel sale = new SaleModel();
+            foreach(var item in Cart)
+            {
+                sale.SaleDetails.Add(new SaleDetailModel()
+                {
+                    ProductId = item.Product.Id,
+                    Quantity = item.QuantityInCart
+                });
 
+            }
+            await saleEndpoint.PostSale(sale);
         }
 
         private ProductDisplayModel selectedProduct;

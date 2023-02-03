@@ -20,8 +20,8 @@ namespace RMDesktopUI.ViewModels
             eventAgregator = events;
         }
 
-        private string username;
-        private string password;
+        private string username="rishabhwadhawan1996@gmail.com";
+        private string password="Rishabh@99";
         private IAPIHelper apiHelper;
         private IEventAggregator eventAgregator;
 
