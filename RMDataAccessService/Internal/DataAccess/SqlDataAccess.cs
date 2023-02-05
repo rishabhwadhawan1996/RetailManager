@@ -17,6 +17,8 @@ namespace RMDataAccessService.Internal.DataAccess
     /// </summary>
     internal class SqlDataAccess : IDisposable
     {
+        private bool isClosed;
+
         /// <summary>
         /// Returns connection string
         /// </summary>
@@ -75,6 +77,7 @@ namespace RMDataAccessService.Internal.DataAccess
             connection = new SqlConnection(connectionString);
             connection.Open();
             transaction = connection.BeginTransaction();
+            isClosed = false;
         }
 
         /// <summary>
@@ -111,17 +114,31 @@ namespace RMDataAccessService.Internal.DataAccess
         {
             transaction?.Commit();
             connection?.Close();
+            isClosed = true;
         }
 
         public void RollbackTransaction()
         {
             transaction?.Rollback();
             connection?.Close();
+            isClosed = true;
         }
 
         public void Dispose()
         {
-            CommitTransaction();
+            if (!isClosed)
+            {
+                try
+                {
+                    CommitTransaction();
+                }
+                catch
+                {
+
+                }
+            }
+            transaction = null;
+            connection = null;
         }
     }
 }

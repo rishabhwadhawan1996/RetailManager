@@ -10,7 +10,7 @@ using RMDataAccessService.Internal.Model;
 namespace RMDataAccessService.DataAccess
 {
     public class SaleData
-    {
+    { 
         public void SaveSales(SaleModel saleInfo,string cashierId)
         {
             List<SaleDetailDbModel> details = new List<SaleDetailDbModel>();
@@ -56,6 +56,7 @@ namespace RMDataAccessService.DataAccess
                         item.SaleId = sale.Id;
                         sql.SaveDataUsingTransaction("dbo.spSaleDetail_Insert", item);
                     }
+                    sql.CommitTransaction();
                 }
                 catch
                 {
