@@ -10,5 +10,7 @@ namespace RMDesktopUILibrary.Models
         string FirstName { get; set; }
         string Id { get; set; }
         string LastName { get; set; }
+
+        void ResetModel();
     }
 }

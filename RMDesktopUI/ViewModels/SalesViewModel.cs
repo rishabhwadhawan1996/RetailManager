@@ -227,6 +227,7 @@ namespace RMDesktopUI.ViewModels
 
             }
             await saleEndpoint.PostSale(sale);
+            await ResetSalesViewModel();
         }
 
         private ProductDisplayModel selectedProduct;
@@ -240,6 +241,16 @@ namespace RMDesktopUI.ViewModels
                 NotifyOfPropertyChange(() => SelectedProduct);
                 NotifyOfPropertyChange(() => CanAddToCart);
             }
+        }
+
+        private async Task ResetSalesViewModel()
+        {
+            Cart = new BindingList<CartItemDisplayModel>();
+            await LoadProducts();
+            NotifyOfPropertyChange(() => SubTotal);
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => Total);
+            NotifyOfPropertyChange(() => CanCheckOut);
         }
 
         private CartItemDisplayModel selectedCartItem;

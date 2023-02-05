@@ -6,6 +6,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using Dapper;
 
 namespace RMDataAccessService.Internal.DataAccess
@@ -14,7 +15,7 @@ namespace RMDataAccessService.Internal.DataAccess
     /// class used to communicate with the database
     /// Should not be used by external code directly
     /// </summary>
-    internal class SqlDataAccess
+    internal class SqlDataAccess : IDisposable
     {
         /// <summary>
         /// Returns connection string
@@ -36,10 +37,10 @@ namespace RMDataAccessService.Internal.DataAccess
         /// <param name="parameteres">parameters</param>
         /// <param name="connectionStringName">connection string name</param>
         /// <returns>list of generic type T</returns>
-        public List<T> LoadData<T,U>(string storedProcedure,U parameteres,string connectionStringName)
+        public List<T> LoadData<T, U>(string storedProcedure, U parameteres, string connectionStringName)
         {
             string connectionString = GetConnectionString(connectionStringName);
-            using(IDbConnection connection = new SqlConnection(connectionString))
+            using (IDbConnection connection = new SqlConnection(connectionString))
             {
                 List<T> rows = connection.Query<T>(storedProcedure, parameteres,
                     commandType: CommandType.StoredProcedure).ToList();
@@ -63,6 +64,64 @@ namespace RMDataAccessService.Internal.DataAccess
                 connection.Execute(storedProcedure, parameteres,
                     commandType: CommandType.StoredProcedure);
             }
+        }
+
+        private IDbConnection connection;
+        private IDbTransaction transaction;
+
+        public void StartTransaction(string connectionStringName)
+        {
+            string connectionString = GetConnectionString(connectionStringName);
+            connection = new SqlConnection(connectionString);
+            connection.Open();
+            transaction = connection.BeginTransaction();
+        }
+
+        /// <summary>
+        /// Save data in the database
+        /// Implemented using Dapper
+        /// </summary>
+        /// <typeparam name="T">Generic type</typeparam>
+        /// <param name="storedProcedure">stored procedure</param>
+        /// <param name="parameteres">parameters</param>
+        public void SaveDataUsingTransaction<T>(string storedProcedure, T parameteres)
+        {
+            connection.Execute(storedProcedure, parameteres,
+                    commandType: CommandType.StoredProcedure, transaction: transaction);
+        }
+
+        /// <summary>
+        /// Returns requested data from db
+        /// Implemented using dapper
+        /// </summary>
+        /// <typeparam name="T">generic type T</typeparam>
+        /// <typeparam name="U">generic type U</typeparam>
+        /// <param name="storedProcedure">stored Procedure</param>
+        /// <param name="parameteres">parameters</param>
+        /// <param name="connectionStringName">connection string name</param>
+        /// <returns>list of generic type T</returns>
+        public List<T> LoadDataInTransaction<T, U>(string storedProcedure, U parameteres)
+        {
+            List<T> rows = connection.Query<T>(storedProcedure, parameteres,
+                    commandType: CommandType.StoredProcedure, transaction: transaction).ToList();
+            return rows;
+        }
+
+        public void CommitTransaction()
+        {
+            transaction?.Commit();
+            connection?.Close();
+        }
+
+        public void RollbackTransaction()
+        {
+            transaction?.Rollback();
+            connection?.Close();
+        }
+
+        public void Dispose()
+        {
+            CommitTransaction();
         }
     }
 }

@@ -54,6 +54,11 @@ namespace RMDesktopUILibrary.Helpers
             }
         }
 
+        public void LogOffUser()
+        {
+            apiClient.DefaultRequestHeaders.Clear();
+        }
+
         public async Task GetLoggedInUserInfo(string token)
         {
             apiClient.DefaultRequestHeaders.Accept.Clear();
@@ -69,7 +74,7 @@ namespace RMDesktopUILibrary.Helpers
                     loggedInUserModel.FirstName = result.FirstName;
                     loggedInUserModel.Id = result.Id;
                     loggedInUserModel.LastName = result.LastName;
-                    loggedInUserModel.Token = result.Token;
+                    loggedInUserModel.Token = token;
                 }
                 else
                 {

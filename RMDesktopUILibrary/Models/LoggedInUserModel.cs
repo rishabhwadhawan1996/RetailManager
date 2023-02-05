@@ -14,5 +14,15 @@ namespace RMDesktopUILibrary.Models
         public string Address { get; set; }
 
         public DateTime CreatedDate { get; set; }
+
+        public void ResetModel()
+        {
+            Token = "";
+            Id = "";
+            FirstName = "";
+            LastName = "";
+            Address = "";
+            CreatedDate = DateTime.Now;
+        }
     }
 }
