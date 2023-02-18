@@ -46,13 +46,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConfigHelper.cs" />
+    <Compile Include="DataAccess\InventoryData.cs" />
     <Compile Include="DataAccess\ProductData.cs" />
     <Compile Include="DataAccess\SaleData.cs" />
     <Compile Include="DataAccess\UserData.cs" />
+    <Compile Include="Internal\Model\InventoryModel.cs" />
     <Compile Include="Internal\Model\SaleDbModel.cs" />
     <Compile Include="Internal\Model\SaleDetailDbModel.cs" />
     <Compile Include="Internal\Model\SaleDetailModel.cs" />
     <Compile Include="Internal\Model\SaleModel.cs" />
+    <Compile Include="Internal\Model\SaleReportModel.cs" />
     <Compile Include="Internal\Model\UserModel.cs" />
     <Compile Include="Internal\Model\ProductModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

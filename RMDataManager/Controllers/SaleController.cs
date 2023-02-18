@@ -22,10 +22,12 @@ namespace RMDataManager.Controllers
             string userId = RequestContext.Principal.Identity.GetUserId();
             saleData.SaveSales(sale,userId);
         }
-        //public List<ProductModel> Get()
-        //{
-        //    ProductData prodData = new ProductData();
-        //    return prodData.GetProducts();
-        //}
+
+        [Route("GetSalesReport")]
+        public List<SaleReportModel> GetSalesReport()
+        {
+            SaleData data = new SaleData();
+            return data.GetSaleReport();
+        }
     }
 }
