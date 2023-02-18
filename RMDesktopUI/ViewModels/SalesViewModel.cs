@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 
 using AutoMapper;
 
@@ -19,18 +22,43 @@ namespace RMDesktopUI.ViewModels
     {
 
         public SalesViewModel(IProductEndpoint prodEndpoint,
-            IConfigHelper configurationHelper, IMapper mapperInstance, ISaleEndpoint saleEndpoint)
+            IConfigHelper configurationHelper, IMapper mapperInstance,
+            ISaleEndpoint saleEndpoint, StatusInfoViewModel status,IWindowManager window)
         {
             this.saleEndpoint = saleEndpoint;
             productEndpoint = prodEndpoint;
             configHelper = configurationHelper;
             mapper = mapperInstance;
+            this.status = status;
+            dialog = window;
         }
 
         protected override async void OnViewLoaded(object view)
         {
             base.OnViewLoaded(view);
-            await LoadProducts();
+            try
+            {
+                await LoadProducts();
+            }
+            catch(Exception ex)
+            {
+                dynamic settings = new ExpandoObject();
+                settings.WindowStartupLocation = WindowStartupLocation.CenterOwneR;
+                settings.ResizeMode = ResizeMode.NoResize;
+                settings.Title = "System Error";
+                if (ex.Message.ToLower() == "unauthorized")
+                {
+                    this.status.UpdateMessage("Unauthrozied Access", "Please check if access permissions are there for accessing Sales form");
+                    await dialog.ShowDialogAsync(this.status, null, settings);
+                }
+                else
+                {
+                    this.status.UpdateMessage("Fatal Exception", ex.Message);
+                    await dialog.ShowDialogAsync(this.status, null, settings);
+                }
+                
+                await TryCloseAsync();
+            }
         }
 
         private async Task LoadProducts()
@@ -69,6 +97,8 @@ namespace RMDesktopUI.ViewModels
         private IProductEndpoint productEndpoint;
         private IConfigHelper configHelper;
         private IMapper mapper;
+        private StatusInfoViewModel status;
+        private IWindowManager dialog;
 
         public int ItemQuantity
         {
