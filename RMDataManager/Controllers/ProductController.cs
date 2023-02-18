@@ -6,7 +6,7 @@ using RMDataAccessService.Internal;
 
 namespace RMDataManager.Controllers
 {
-    //[Authorize]
+    [Authorize(Roles = "Cashier")]
     public class ProductController : ApiController
     {
         public List<ProductModel> Get()
