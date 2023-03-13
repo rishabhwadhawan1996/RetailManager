@@ -4,14 +4,16 @@ using System.Web;
 using System.Web.Http;
 
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 using RMDataAccessService.DataAccess;
 using RMDataAccessService.Internal.Model;
 
+using RMDataManager.Models;
+
 namespace RMDataManager.Controllers
 {
     [Authorize]
-    [RoutePrefix("api/User")]
     public class UserController : ApiController
     {
         public UserModel GetById()
@@ -19,6 +21,79 @@ namespace RMDataManager.Controllers
             string userId = RequestContext.Principal.Identity.GetUserId();
             UserData data = new UserData();
             return data.GetUserById(userId).First();
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        [Route("api/User/Admin/GetAllUsers")]
+        public List<ApplicationUserModel> GetAllUsers()
+        {
+            List<ApplicationUserModel> output = new List<ApplicationUserModel>();
+
+            using (var context = new ApplicationDbContext())
+            {
+                var userStore = new UserStore<ApplicationUser>(context);
+                var userManager = new UserManager<ApplicationUser>(userStore);
+
+                var users = userManager.Users.ToList();
+                var roles = context.Roles.ToList();
+
+                foreach (var user in users)
+                {
+                    ApplicationUserModel appUser = new ApplicationUserModel
+                    {
+                        Email = user.Email,
+                        Id = user.Id
+                    };
+                    foreach (var role in user.Roles)
+                    {
+                        appUser.Roles.Add(role.RoleId, roles.Where(x => x.Id == role.RoleId)
+                            .FirstOrDefault().Name);
+                    }
+                    output.Add(appUser);
+                }
+            }
+            return output;
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        [Route("api/User/Admin/GetAllRoles")]
+        public Dictionary<string, string> GetAllRoles()
+        {
+            using (var context = new ApplicationDbContext())
+            {
+                var roles = context.Roles.ToDictionary(x => x.Id, x => x.Name);
+                return roles;
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        [Route("api/User/Admin/AddRole")]
+        public void AddARole(UserRolePairModel pairing)
+        {
+            using (var context = new ApplicationDbContext())
+            {
+                var userStore = new UserStore<ApplicationUser>(context);
+                var userManager = new UserManager<ApplicationUser>(userStore);
+
+                userManager.AddToRole(pairing.UserId,pairing.RoleName);
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        [Route("api/User/Admin/DeleteRole")]
+        public void DeleteARole(UserRolePairModel pairing)
+        {
+            using (var context = new ApplicationDbContext())
+            {
+                var userStore = new UserStore<ApplicationUser>(context);
+                var userManager = new UserManager<ApplicationUser>(userStore);
+
+                userManager.RemoveFromRole(pairing.UserId, pairing.RoleName);
+            }
         }
     }
 }

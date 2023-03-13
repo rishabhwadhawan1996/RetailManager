@@ -38,6 +38,7 @@ namespace RMDesktopUI
             container.Instance(mapper);
             container.Instance(container).PerRequest<IProductEndpoint, ProductEndpoint>();
             container.Instance(container).PerRequest<ISaleEndpoint, SaleEndpoint>();
+            container.Instance(container).PerRequest<IUserEndpoint, UserEndpoint>();
             container.Singleton<IWindowManager, WindowManager>()
                 .Singleton<IEventAggregator, EventAggregator>()
                 .Singleton<ILoggedInUserModel, LoggedInUserModel>()

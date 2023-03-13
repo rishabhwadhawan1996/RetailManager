@@ -43,7 +43,7 @@ namespace RMDesktopUI.ViewModels
             catch(Exception ex)
             {
                 dynamic settings = new ExpandoObject();
-                settings.WindowStartupLocation = WindowStartupLocation.CenterOwneR;
+                settings.WindowStartupLocation = WindowStartupLocation.CenterOwner;
                 settings.ResizeMode = ResizeMode.NoResize;
                 settings.Title = "System Error";
                 if (ex.Message.ToLower() == "unauthorized")
